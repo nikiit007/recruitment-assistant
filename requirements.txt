@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pymilvus
+sentence-transformers
+PyPDF2
+pydantic
+pydantic-settings
+pytest
+openai
