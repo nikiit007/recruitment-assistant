@@ -6,5 +6,4 @@ class ResizeObserver {
   disconnect() {}
 }
 
-// @ts-expect-error - making available globally for jsdom tests
-globalThis.ResizeObserver = ResizeObserver;
+globalThis.ResizeObserver = ResizeObserver as unknown as typeof globalThis.ResizeObserver;
