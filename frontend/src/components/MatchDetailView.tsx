@@ -10,77 +10,95 @@ type MatchDetailViewProps = {
 
 export const MatchDetailView: React.FC<MatchDetailViewProps> = ({ candidate, detail, onBack }) => {
   return (
-    <div className="relative bg-slate-50 min-h-[70vh] rounded-2xl shadow-inner overflow-hidden">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <div className="detail-shell">
+      <div className="detail-banner">
         <div>
-          <p className="text-xs uppercase tracking-wide text-slate-500">Active Requisition</p>
-          <h2 className="text-2xl font-bold text-slate-900">{candidate.role}</h2>
-          <p className="text-sm text-slate-500">{candidate.name}</p>
+          <p className="eyebrow" style={{ color: '#c7d2fe' }}>
+            Active Requisition
+          </p>
+          <div style={{ fontSize: 18, fontWeight: 700 }}>{candidate.role}</div>
+          <p className="secondary-text" style={{ color: '#cbd5e1' }}>{candidate.name}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-xs text-slate-500">AI Match Score</p>
-            <p className="text-3xl font-bold text-indigo-600">{Math.round(detail.explanation.matchScore)}</p>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ textAlign: 'right' }}>
+            <p className="secondary-text" style={{ color: '#cbd5e1' }}>
+              AI Match Score
+            </p>
+            <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: '#f8fafc' }}>
+              {Math.round(detail.explanation.matchScore)}
+            </p>
           </div>
           {onBack && (
             <button
               onClick={onBack}
-              className="text-sm px-3 py-1 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100"
+              style={{
+                padding: '8px 12px',
+                borderRadius: 10,
+                border: '1px solid rgba(248, 250, 252, 0.5)',
+                background: 'rgba(255,255,255,0.08)',
+                color: '#e5e7eb',
+                cursor: 'pointer',
+              }}
             >
-              Back to list
+              Back
             </button>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 h-full">
-        <div className="p-6 border-r border-slate-200 bg-white overflow-y-auto">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Job Description</h3>
-          <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{detail.jobDescription}</p>
+      <div className="detail-panel">
+        <div className="detail-column">
+          <h3>Job Description</h3>
+          <p className="detail-copy">{detail.jobDescription}</p>
+          <h3>Candidate Resume</h3>
+          <p className="detail-copy">{detail.resumeText}</p>
         </div>
-        <div className="p-6 bg-white overflow-y-auto">
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">Candidate Resume</h3>
-          <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{detail.resumeText}</p>
-        </div>
-      </div>
-
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="max-w-3xl w-full mx-6 bg-white/90 backdrop-blur shadow-2xl rounded-2xl border border-indigo-100 p-6 pointer-events-auto">
-          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Glass Box Explanation</p>
-              <h3 className="text-xl font-semibold text-slate-900">Why this candidate?</h3>
+        <div className="detail-column">
+          <div className="panel">
+            <div className="card-header" style={{ marginBottom: 0 }}>
+              <div>
+                <p className="eyebrow" style={{ color: '#4f46e5' }}>
+                  Glass Box Explanation
+                </p>
+                <h3 style={{ margin: 0, fontSize: 17 }}>Why this candidate?</h3>
+              </div>
+              <span className="pill" style={{ background: '#eef2ff', color: '#312e81', border: 'none' }}>
+                Score: {Math.round(detail.explanation.matchScore)}
+              </span>
             </div>
-            <span className="text-sm font-medium px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-              Score: {Math.round(detail.explanation.matchScore)}
-            </span>
-          </div>
-          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap mb-4">{detail.explanation.chainOfThought}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            <div className="bg-green-50 border border-green-100 rounded-xl p-3">
-              <h4 className="text-sm font-semibold text-green-800 mb-1">Green Flags</h4>
-              <ul className="list-disc list-inside text-sm text-green-700 space-y-1">
-                {detail.explanation.greenFlags.map((flag) => (
-                  <li key={flag}>{flag}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-red-50 border border-red-100 rounded-xl p-3">
-              <h4 className="text-sm font-semibold text-red-800 mb-1">Red Flags</h4>
-              <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-                {detail.explanation.redFlags.map((flag) => (
-                  <li key={flag}>{flag}</li>
-                ))}
-              </ul>
+            <p className="detail-copy" style={{ marginTop: -2 }}>{detail.explanation.chainOfThought}</p>
+            <div className="flag-grid">
+              <div className="flag-card">
+                <strong style={{ color: '#166534' }}>Green Flags</strong>
+                <ul>
+                  {detail.explanation.greenFlags.map((flag) => (
+                    <li key={flag}>{flag}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flag-card red">
+                <strong style={{ color: '#b91c1c' }}>Red Flags</strong>
+                <ul>
+                  {detail.explanation.redFlags.map((flag) => (
+                    <li key={flag}>{flag}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-slate-900">Skill Heatmap</h4>
-              <div className="flex gap-2 text-[11px] text-slate-500">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> High</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400" /> Partial</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> Missing</span>
+          <div className="panel">
+            <div className="card-header" style={{ marginBottom: 0 }}>
+              <h4 style={{ margin: 0, fontSize: 15 }}>Skill heatmap</h4>
+              <div className="legend">
+                <span>
+                  <span className="dot" style={{ background: '#22c55e' }} /> High
+                </span>
+                <span>
+                  <span className="dot" style={{ background: '#facc15' }} /> Partial
+                </span>
+                <span>
+                  <span className="dot" style={{ background: '#ef4444' }} /> Missing
+                </span>
               </div>
             </div>
             <Heatmap skills={detail.skills} />
