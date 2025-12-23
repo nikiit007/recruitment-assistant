@@ -113,13 +113,13 @@ const SankeyTooltip: React.FC<TooltipProps<number, string>> = ({ active, payload
 };
 
 const DiversitySankey: React.FC<DiversitySankeyProps> = ({ candidates }) => {
-  const { sankeyData, warnings } = useMemo(() => {
+  const { sankeyData, groups, warnings } = useMemo(() => {
     const augmented = withMockDemographics(candidates);
     const funnelGroups = buildGroups(augmented);
     const sankey = createSankeyData(funnelGroups);
     const warningGroups = funnelGroups.filter((group) => group.dropOffRate > 0.2);
 
-    return { sankeyData: sankey, warnings: warningGroups };
+    return { sankeyData: sankey, groups: funnelGroups, warnings: warningGroups };
   }, [candidates]);
 
   return (
