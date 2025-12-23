@@ -144,6 +144,30 @@ const DiversitySankey: React.FC<DiversitySankeyProps> = ({ candidates }) => {
           </Sankey>
         </ResponsiveContainer>
       </div>
+
+      <div className="heatmap-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+        {groups.map((group) => (
+          <div key={group.label} className="heatmap-item" style={{ background: '#fff' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#0f172a' }}>{group.label}</div>
+              <p className="secondary-text" style={{ margin: '4px 0' }}>
+                Applicants → Screened → Shortlisted
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, fontSize: 14 }}>
+                <span>Applicants</span>
+                <strong style={{ textAlign: 'right' }}>{group.applicants}</strong>
+                <span>AI Screened</span>
+                <strong style={{ textAlign: 'right' }}>{group.screened}</strong>
+                <span>Shortlisted</span>
+                <strong style={{ textAlign: 'right' }}>{group.shortlisted}</strong>
+              </div>
+              <div style={{ marginTop: 6, fontWeight: 700, color: group.dropOffRate > 0.2 ? '#92400e' : '#166534' }}>
+                Drop-off: {Math.round(group.dropOffRate * 100)}%
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

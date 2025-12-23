@@ -287,9 +287,8 @@ body {
 }
 
 .detail-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  position: relative;
+  min-height: 540px;
 }
 
 .detail-banner {
@@ -298,12 +297,9 @@ body {
   border-radius: 16px;
   padding: 18px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
-  position: relative;
-  z-index: 2;
 }
 
 .detail-banner strong {
@@ -311,28 +307,9 @@ body {
   color: #f8fafc;
 }
 
-.detail-score {
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(248, 250, 252, 0.35);
-  background: rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 110px;
-  align-items: flex-end;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-}
-
-.detail-score-number {
-  margin: 0;
-  font-size: 30px;
-  font-weight: 800;
-  color: #f8fafc;
-  line-height: 1.1;
-}
-
 .detail-panel {
+  position: absolute;
+  inset: 60px 12px 12px;
   background: rgba(255, 255, 255, 0.96);
   border-radius: 18px;
   border: 1px solid #e2e8f0;
@@ -341,8 +318,6 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 12px;
-  position: relative;
-  z-index: 1;
 }
 
 .detail-column {
