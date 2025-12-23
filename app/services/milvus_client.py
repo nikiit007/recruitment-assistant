@@ -54,6 +54,11 @@ def get_or_create_collection(alias: str = "default") -> Collection:
 
 
 def get_collection(alias: str = "default") -> Optional[Collection]:
+    connect_milvus(alias=alias)
+
     if not utility.has_collection(settings.milvus_collection, using=alias):
         return None
-    return Collection(name=settings.milvus_collection, using=alias)
+
+    collection = Collection(name=settings.milvus_collection, using=alias)
+    collection.load()
+    return collection
