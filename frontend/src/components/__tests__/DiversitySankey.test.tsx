@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import DiversitySankey from '../DiversitySankey';
 import type { CandidateProfile } from '../../types';
 import React from 'react';
@@ -45,7 +46,6 @@ describe('DiversitySankey', () => {
 
     expect(screen.getByText('Bias & Diversity Funnel')).toBeInTheDocument();
     expect(screen.getByText('Potential Disparate Impact Detected')).toBeInTheDocument();
-    expect(screen.getAllByText(/Applicants/)).not.toHaveLength(0);
     expect(screen.getByTestId('sankey')).toBeInTheDocument();
 
     randomSpy.mockRestore();

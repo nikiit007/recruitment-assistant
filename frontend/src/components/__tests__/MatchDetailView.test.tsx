@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import MatchDetailView from '../MatchDetailView';
 import type { CandidateProfile, MatchDetail } from '../../types';
 
