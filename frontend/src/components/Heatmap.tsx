@@ -8,23 +8,23 @@ type HeatmapProps = {
 const colorForLevel = (level: SkillSignal['level']) => {
   switch (level) {
     case 'high':
-      return 'bg-green-500';
+      return '#22c55e';
     case 'medium':
-      return 'bg-yellow-400';
+      return '#facc15';
     default:
-      return 'bg-red-500';
+      return '#ef4444';
   }
 };
 
 export const Heatmap: React.FC<HeatmapProps> = ({ skills }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div className="heatmap-grid">
       {skills.map((skill) => (
-        <div key={skill.name} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-2">
-          <div className={`w-3 h-3 rounded-full ${colorForLevel(skill.level)}`} />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800">{skill.name}</p>
-            {skill.evidence && <p className="text-[11px] text-slate-500">{skill.evidence}</p>}
+        <div key={skill.name} className="heatmap-item">
+          <div className="dot" style={{ background: colorForLevel(skill.level) }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontWeight: 700, color: '#0f172a' }}>{skill.name}</p>
+            {skill.evidence && <p className="secondary-text" style={{ margin: 0 }}>{skill.evidence}</p>}
           </div>
         </div>
       ))}
