@@ -20,13 +20,11 @@ export const MatchDetailView: React.FC<MatchDetailViewProps> = ({ candidate, det
           <p className="secondary-text" style={{ color: '#cbd5e1' }}>{candidate.name}</p>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{ textAlign: 'right' }}>
-            <p className="secondary-text" style={{ color: '#cbd5e1' }}>
+          <div className="detail-score">
+            <p className="secondary-text" style={{ color: '#dbeafe', margin: 0 }}>
               AI Match Score
             </p>
-            <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: '#f8fafc' }}>
-              {Math.round(detail.explanation.matchScore)}
-            </p>
+            <p className="detail-score-number">{Math.round(detail.explanation.matchScore)}</p>
           </div>
           {onBack && (
             <button
