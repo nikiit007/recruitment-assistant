@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     chunk_size: int = 500
     chunk_overlap: int = 50
     openai_api_key: str | None = None
+    gemini_api_key: str | None = None
+    llm_provider: str = "openai"
     llm_model: str = "gpt-4o-mini"
+    gemini_model: str = "gemini-2.0-flash"
 
 
 settings = Settings()
