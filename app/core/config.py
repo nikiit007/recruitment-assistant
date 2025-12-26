@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     chunk_size: int = 500
     chunk_overlap: int = 50
+    text_chunk_max_length: int = 2048
     openai_api_key: str | None = None
     gemini_api_key: str | None = None
     llm_provider: str = "openai"

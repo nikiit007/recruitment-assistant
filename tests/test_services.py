@@ -84,6 +84,14 @@ def test_chunk_text_overlap():
     ]
 
 
+def test_chunk_text_respects_max_length():
+    text = " ".join(["word"] * 20)
+    chunks = ingestion.chunk_text(text, chunk_size=20, overlap=0, max_length=20)
+
+    assert all(len(chunk) <= 20 for chunk in chunks)
+    assert " ".join(chunks).split() == text.split()
+
+
 def test_ingest_resume_inserts_chunks(monkeypatch, tmp_path):
     stub_collection = StubCollection()
     stub_model = StubModel()

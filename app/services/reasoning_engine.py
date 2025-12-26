@@ -5,6 +5,8 @@ from openai import OpenAI
 
 from app.core.config import settings
 
+SYSTEM_INSTRUCTION = "Provide transparent reasoning and follow JSON instructions precisely."
+
 PROMPT_TEMPLATE = (
     "You are an expert Technical Recruiter. "
     "Job Description: {job_description}\n"
@@ -37,6 +39,7 @@ def analyze_match(
             raise ValueError("GEMINI_API_KEY is required when llm_provider is gemini.")
 
         from google import genai
+        from google.genai import types
 
         llm_client = genai.Client(api_key=settings.gemini_api_key)
         model_name = model or settings.gemini_model
@@ -44,9 +47,13 @@ def analyze_match(
         completion = llm_client.models.generate_content(
             model=model_name,
             contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION,
+                response_mime_type="application/json",
+            ),
         )
         content = completion.text or "{}"
-        return json.loads(content)
+        return _parse_json_content(content)
 
     llm_client = client or OpenAI(api_key=settings.openai_api_key)
     model_name = model or settings.llm_model
@@ -58,11 +65,25 @@ def analyze_match(
         messages=[
             {
                 "role": "system",
-                "content": "Provide transparent reasoning and follow JSON instructions precisely.",
+                "content": SYSTEM_INSTRUCTION,
             },
             {"role": "user", "content": prompt},
         ],
     )
 
     content = completion.choices[0].message.content or "{}"
-    return json.loads(content)
+    return _parse_json_content(content)
+
+
+def _parse_json_content(content: str) -> Dict[str, Any]:
+    content = content.strip()
+    if not content:
+        raise ValueError("LLM response was empty.")
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        start = content.find("{")
+        end = content.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            return json.loads(content[start : end + 1])
+        raise

@@ -9,6 +9,19 @@ from app.core.config import settings
 from app.services.milvus_client import get_or_create_collection
 
 
+def _utf8_length(value: str) -> int:
+    return len(value.encode("utf-8"))
+
+
+def _trim_to_max_bytes(value: str, max_bytes: int) -> str:
+    if max_bytes <= 0:
+        return ""
+    encoded = value.encode("utf-8")
+    if len(encoded) <= max_bytes:
+        return value
+    return encoded[:max_bytes].decode("utf-8", errors="ignore")
+
+
 def extract_text_from_pdf(file_path: str) -> str:
     reader = PdfReader(file_path)
     text_segments: List[str] = []
@@ -22,8 +35,9 @@ def chunk_text(
     text: str,
     chunk_size: int = settings.chunk_size,
     overlap: int = settings.chunk_overlap,
+    max_length: int = settings.text_chunk_max_length,
 ) -> List[str]:
-    """Chunk text by whitespace tokens with configurable overlap."""
+    """Chunk text by whitespace tokens with configurable overlap and size caps."""
 
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
@@ -31,14 +45,31 @@ def chunk_text(
     tokens = text.split()
     chunks: List[str] = []
     start = 0
-    stride = max(1, chunk_size - max(0, overlap))
-
     while start < len(tokens):
-        end = start + chunk_size
+        end = min(start + chunk_size, len(tokens))
         chunk = " ".join(tokens[start:end])
+
+        if max_length > 0 and _utf8_length(chunk) > max_length:
+            while end > start and _utf8_length(chunk) > max_length:
+                end -= 1
+                chunk = " ".join(tokens[start:end])
+
+            if end == start:
+                # Single token longer than max_length; truncate to fit.
+                chunk = _trim_to_max_bytes(tokens[start], max_length)
+                if chunk:
+                    chunks.append(chunk)
+                start += 1
+                continue
+
         if chunk:
             chunks.append(chunk)
-        start += stride
+
+        if overlap > 0:
+            next_start = end - overlap
+            start = end if next_start <= start else next_start
+        else:
+            start = end
 
     return chunks
 

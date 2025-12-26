@@ -8,7 +8,7 @@ from app.core.config import settings
 FIELDS = [
     FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
     FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=384),
-    FieldSchema(name="text_chunk", dtype=DataType.VARCHAR, max_length=2048),
+    FieldSchema(name="text_chunk", dtype=DataType.VARCHAR, max_length=settings.text_chunk_max_length),
     FieldSchema(name="candidate_name", dtype=DataType.VARCHAR, max_length=256),
     FieldSchema(name="skills", dtype=DataType.JSON),
 ]
