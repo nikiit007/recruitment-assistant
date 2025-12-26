@@ -32,6 +32,22 @@ def analyze_match(
         candidate_profile=candidate_profile.strip(),
     )
 
+    if settings.llm_provider.lower() == "gemini":
+        if not settings.gemini_api_key:
+            raise ValueError("GEMINI_API_KEY is required when llm_provider is gemini.")
+
+        from google import genai
+
+        llm_client = genai.Client(api_key=settings.gemini_api_key)
+        model_name = model or settings.gemini_model
+
+        completion = llm_client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
+        content = completion.text or "{}"
+        return json.loads(content)
+
     llm_client = client or OpenAI(api_key=settings.openai_api_key)
     model_name = model or settings.llm_model
 
