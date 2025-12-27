@@ -134,28 +134,29 @@ npm run dev -- --host --port 5173
 
 **Frontend flow diagram**
 ```mermaid
-sequenceDiagram
-  participant U as User
-  participant UI as React UI
-  participant API as FastAPI
-  participant M as Milvus
+flowchart LR
+  classDef input fill:#e0f2fe,stroke:#1e3a8a,stroke-width:1px,color:#0f172a;
+  classDef api fill:#e2e8f0,stroke:#1e293b,stroke-width:1px,color:#0f172a;
+  classDef store fill:#fef9c3,stroke:#a16207,stroke-width:1px,color:#0f172a;
+  classDef llm fill:#fee2e2,stroke:#991b1b,stroke-width:1px,color:#0f172a;
+  classDef ui fill:#f3e8ff,stroke:#6b21a8,stroke-width:1px,color:#0f172a;
 
-  U->>UI: Upload job description PDF
-  UI->>API: POST /extract-text
-  API-->>UI: Extracted job text
-  U->>UI: Upload resume PDFs
-  loop For each resume
-    UI->>API: POST /extract-text
-    UI->>API: POST /ingest
-    API->>M: Insert chunks + embeddings
-    API-->>UI: Chunk count
-    UI->>API: POST /api/match
-    API-->>UI: Match score + flags
-  end
-  UI->>API: POST /search
-  API->>M: Vector search
-  API-->>UI: Top chunk results
-  UI-->>U: Ranked candidates + detail panels
+  JD["Job description PDF or text"]:::input
+  RES["Resume PDFs"]:::input
+  UI["React dashboard"]:::ui
+  EXTRACT["POST /extract-text"]:::api
+  INGEST["POST /ingest"]:::api
+  MATCH["POST /api/match"]:::api
+  SEARCH["POST /search"]:::api
+  MILVUS["Milvus vector DB"]:::store
+  LLM["OpenAI or Gemini"]:::llm
+
+  JD --> UI
+  RES --> UI
+  UI --> EXTRACT --> UI
+  UI --> INGEST --> MILVUS
+  UI --> MATCH --> LLM --> MATCH --> UI
+  UI --> SEARCH --> MILVUS --> SEARCH --> UI
 ```
 Note: Mermaid diagrams render in GitHub and other Markdown viewers that support Mermaid.
 
@@ -211,6 +212,56 @@ The backend lives under `app/` and exposes a small set of endpoints for PDF inge
 **Initialization and tests**
 - `db_init.py` bootstraps the collection and index using the same schema + TLS options.
 - Tests live in `tests/` and include service-level coverage for the reasoning + search pipeline.
+
+## Application flow
+The diagram below summarizes how the UI, API, Milvus, and the LLM work together for a typical run.
+
+```mermaid
+flowchart LR
+  classDef input fill:#e0f2fe,stroke:#1e3a8a,stroke-width:1px,color:#0f172a;
+  classDef api fill:#e2e8f0,stroke:#1e293b,stroke-width:1px,color:#0f172a;
+  classDef proc fill:#dcfce7,stroke:#166534,stroke-width:1px,color:#0f172a;
+  classDef store fill:#fef9c3,stroke:#a16207,stroke-width:1px,color:#0f172a;
+  classDef llm fill:#fee2e2,stroke:#991b1b,stroke-width:1px,color:#0f172a;
+  classDef ui fill:#f3e8ff,stroke:#6b21a8,stroke-width:1px,color:#0f172a;
+
+  subgraph Inputs
+    JD["Job description PDF or text"]:::input
+    RES["Resume PDFs"]:::input
+  end
+
+  subgraph Frontend
+    UI["React dashboard"]:::ui
+  end
+
+  subgraph Backend
+    EXTRACT["POST /extract-text\n(PyPDF2)"]:::api
+    INGEST["POST /ingest"]:::api
+    MATCH["POST /api/match"]:::api
+    SEARCH["POST /search"]:::api
+  end
+
+  subgraph Processing
+    CHUNK["Chunk text (overlap)"]:::proc
+    EMBED_RES["Embed resume chunks"]:::proc
+    EMBED_QUERY["Embed job description"]:::proc
+  end
+
+  subgraph Storage
+    MILVUS["Milvus vector DB (HNSW, COSINE)"]:::store
+  end
+
+  subgraph LLMs
+    LLM["OpenAI or Gemini"]:::llm
+  end
+
+  JD --> UI
+  RES --> UI
+  UI --> EXTRACT --> UI
+  UI --> INGEST --> CHUNK --> EMBED_RES --> MILVUS
+  UI --> MATCH --> LLM --> MATCH --> UI
+  UI --> SEARCH --> EMBED_QUERY --> MILVUS --> SEARCH --> UI
+```
 
 ## Notes
 - The backend depends on valid OpenAI or Gemini credentials for LLM reasoning calls.
