@@ -2,229 +2,391 @@ import React from 'react';
 import CandidateCard from './components/CandidateCard';
 import DiversitySankey from './components/DiversitySankey';
 import MatchDetailView from './components/MatchDetailView';
-import { CandidateProfile, MatchDetail } from './types';
+import { CandidateProfile, MatchDetail, SkillSignal } from './types';
 
-const candidates: CandidateProfile[] = [
-  {
-    id: '1',
-    name: 'Jordan Alvarez',
-    role: 'Full-Stack Engineer',
-    matchScore: 92,
-    yearsExperience: 6,
-    location: 'Remote',
-    skills: [
-      { name: 'TypeScript', level: 'high', evidence: 'Led TypeScript migration for core app' },
-      { name: 'React', level: 'high', evidence: 'Built design system components' },
-      { name: 'Node.js', level: 'medium', evidence: 'Maintains internal services' },
-      { name: 'GraphQL', level: 'medium' },
-      { name: 'Testing', level: 'high', evidence: 'Added Vitest + RTL coverage' },
-      { name: 'DevOps', level: 'low' },
-    ],
-    summary: 'Engineer focused on user-centric product features with strong testing discipline.',
-    highlights: ['Shipped analytics suite improving activation by 12%', 'Mentors two junior engineers'],
-    explanation: {
-      chainOfThought: 'Strong frontend expertise with solid backend experience; aligns with role requirements.',
-      greenFlags: ['Demonstrated ownership of full-stack projects', 'Experience with design systems'],
-      redFlags: ['Limited infrastructure exposure'],
-    },
-  },
-  {
-    id: '2',
-    name: 'Taylor Chen',
-    role: 'Full-Stack Engineer',
-    matchScore: 88,
-    yearsExperience: 7,
-    location: 'Seattle',
-    skills: [
-      { name: 'React', level: 'high', evidence: 'Built internal portal serving 5 teams' },
-      { name: 'Next.js', level: 'medium', evidence: 'Owns SSR performance' },
-      { name: 'Node.js', level: 'high', evidence: 'Designs backend APIs' },
-      { name: 'Databases', level: 'medium', evidence: 'Optimized slow queries' },
-      { name: 'Testing', level: 'medium' },
-      { name: 'DevOps', level: 'low' },
-    ],
-    summary: 'Generalist engineer with a record of delivery for growth-stage teams.',
-    highlights: ['Scaled SSR pages to <1s TTFB', 'Partnered with design for accessibility revamp'],
-    explanation: {
-      chainOfThought: 'Comfortable across stack with emphasis on DX and web performance.',
-      greenFlags: ['Owns performance budgets', 'Shipped cross-team initiatives'],
-      redFlags: ['Lighter cloud automation exposure'],
-    },
-  },
-  {
-    id: '3',
-    name: 'Priya Desai',
-    role: 'Full-Stack Engineer',
-    matchScore: 86,
-    yearsExperience: 5,
-    location: 'Remote - EST',
-    skills: [
-      { name: 'TypeScript', level: 'high', evidence: 'Built typed SDK for partners' },
-      { name: 'React', level: 'high', evidence: 'Created component library' },
-      { name: 'GraphQL', level: 'medium', evidence: 'Defined shared schemas' },
-      { name: 'Go', level: 'medium', evidence: 'Maintains auth service' },
-      { name: 'Testing', level: 'medium', evidence: 'Introduced contract testing' },
-      { name: 'DevOps', level: 'medium' },
-    ],
-    summary: 'Builder who pairs product thinking with dependable delivery of platform features.',
-    highlights: ['Launched partner API with 99.9% uptime', 'Runs inclusive interviewing loop'],
-    explanation: {
-      chainOfThought: 'Strong frontend depth plus service ownership; brings reliability mindset.',
-      greenFlags: ['Owns partner-facing APIs', 'Introduced contract testing'],
-      redFlags: ['Has not led large team yet'],
-    },
-  },
-  {
-    id: '4',
-    name: 'Samira Holt',
-    role: 'Full-Stack Engineer',
-    matchScore: 83,
-    yearsExperience: 8,
-    location: 'Denver',
-    skills: [
-      { name: 'TypeScript', level: 'medium', evidence: 'Migrated legacy JS modules' },
-      { name: 'React', level: 'high', evidence: 'Leads UI modernization efforts' },
-      { name: 'Node.js', level: 'high', evidence: 'Owns messaging services' },
-      { name: 'GraphQL', level: 'low' },
-      { name: 'Testing', level: 'medium', evidence: 'Adds visual regression coverage' },
-      { name: 'DevOps', level: 'medium', evidence: 'Builds CI pipelines' },
-    ],
-    summary: 'Seasoned contributor who modernizes stacks and hardens release pipelines.',
-    highlights: ['Cut deployment time by 40%', 'Rebuilt design tokens with design partners'],
-    explanation: {
-      chainOfThought: 'Systems-minded engineer with UI polish and delivery maturity.',
-      greenFlags: ['Owns CI/CD improvements', 'Expert in UI modernization'],
-      redFlags: ['GraphQL practice is emerging'],
-    },
-  },
-  {
-    id: '5',
-    name: 'Diego Martins',
-    role: 'Full-Stack Engineer',
-    matchScore: 80,
-    yearsExperience: 6,
-    location: 'Austin',
-    skills: [
-      { name: 'TypeScript', level: 'medium', evidence: 'Refined typings for APIs' },
-      { name: 'React', level: 'medium', evidence: 'Delivers feature pods end-to-end' },
-      { name: 'Node.js', level: 'medium', evidence: 'Maintains billing integrations' },
-      { name: 'Python', level: 'medium' },
-      { name: 'Testing', level: 'medium', evidence: 'Adds monitoring to services' },
-      { name: 'DevOps', level: 'low' },
-    ],
-    summary: 'Pragmatic engineer comfortable collaborating with product and data partners.',
-    highlights: ['Improved billing reliability by 15%', 'Runs weekly incident reviews'],
-    explanation: {
-      chainOfThought: 'Solid fundamentals with good collaboration and operational discipline.',
-      greenFlags: ['Experience with billing and reliability', 'Communicates clearly with stakeholders'],
-      redFlags: ['Still ramping on advanced frontend patterns'],
-    },
-  },
-];
+type SearchResult = {
+  text: string;
+  score: number;
+};
 
-const candidateDetails: Record<string, MatchDetail> = {
-  '1': {
-    jobDescription: 'We are hiring a full-stack engineer to build data-rich dashboards and secure APIs.',
-    resumeText: '6 years experience building frontend and backend features across multiple products.',
-    explanation: {
-      matchScore: 92,
-      chainOfThought: 'Candidate shows strengths across TS/React with proven delivery.',
-      greenFlags: ['Has led migrations and mentoring'],
-      redFlags: ['Infrastructure exposure is lighter'],
+type MatchResponse = {
+  matchScore: number;
+  chainOfThought: string;
+  greenFlags: string[];
+  redFlags: string[];
+};
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000';
+const MAX_MATCH_TEXT = 4000;
+const MAX_DISPLAY_TEXT = 1000;
+
+const normalizeKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+const pickValue = (source: Record<string, unknown>, keys: string[]) => {
+  for (const [key, value] of Object.entries(source)) {
+    const normalizedKey = normalizeKey(key);
+    if (keys.some((item) => item === normalizedKey)) {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+const asStringArray = (value: unknown) => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string');
+  }
+  if (typeof value === 'string') {
+    return [value];
+  }
+  return [];
+};
+
+const parseMatchResponse = (payload: Record<string, unknown>): MatchResponse => {
+  const scoreValue = pickValue(payload, ['matchscore', 'score', 'match']);
+  const chainValue = pickValue(payload, ['chainofthought', 'explanation', 'analysis']);
+  const greenValue = pickValue(payload, ['greenflags', 'strengths', 'pros']);
+  const redValue = pickValue(payload, ['redflags', 'gaps', 'cons']);
+
+  const matchScore = Number(scoreValue);
+
+  return {
+    matchScore: Number.isFinite(matchScore) ? matchScore : 0,
+    chainOfThought: typeof chainValue === 'string' ? chainValue : '',
+    greenFlags: asStringArray(greenValue),
+    redFlags: asStringArray(redValue),
+  };
+};
+
+const cleanWhitespace = (value: string) => value.replace(/\s+/g, ' ').trim();
+
+const truncateText = (value: string, limit: number) => {
+  if (value.length <= limit) return value;
+  return `${value.slice(0, Math.max(0, limit - 3))}...`;
+};
+
+const candidateNameFromFile = (filename: string) =>
+  filename.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ').trim();
+
+const labelFromFlag = (flag: string) => {
+  const trimmed = flag.replace(/["']/g, '').trim();
+  if (trimmed.length <= 24) return trimmed;
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  if (words.length <= 4) return `${trimmed.slice(0, 21)}...`;
+  return `${words.slice(0, 4).join(' ')}...`;
+};
+
+const buildSkillSignals = (greenFlags: string[], redFlags: string[]): SkillSignal[] => {
+  const skills: SkillSignal[] = [];
+  const seen = new Set<string>();
+
+  const addSkill = (flag: string, level: SkillSignal['level']) => {
+    if (!flag) return;
+    const label = labelFromFlag(flag);
+    if (!label || seen.has(label)) return;
+    seen.add(label);
+    skills.push({ name: label, level, evidence: flag });
+  };
+
+  greenFlags.slice(0, 5).forEach((flag) => addSkill(flag, 'high'));
+  redFlags.slice(0, 3).forEach((flag) => addSkill(flag, 'low'));
+
+  return skills;
+};
+
+const fetchJson = async (url: string, options?: RequestInit) => {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Request failed with ${response.status}`);
+  }
+  return response.json();
+};
+
+const extractText = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const data = await fetchJson(`${API_BASE_URL}/extract-text`, {
+    method: 'POST',
+    body: formData,
+  });
+  return typeof data.text === 'string' ? data.text : '';
+};
+
+const ingestResume = async (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const data = await fetchJson(`${API_BASE_URL}/ingest`, {
+    method: 'POST',
+    body: formData,
+  });
+  return typeof data.chunks === 'number' ? data.chunks : 0;
+};
+
+const runMatch = async (jobDescription: string, resumeText: string) => {
+  const payload = {
+    candidate_profile: resumeText,
+    job_description: jobDescription,
+  };
+
+  return fetchJson(`${API_BASE_URL}/api/match`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-    skills: candidates[0].skills,
-  },
-  '2': {
-    jobDescription: 'Full-stack engineer to partner with design on performance and accessibility.',
-    resumeText: '7 years experience in growth-stage companies with emphasis on SSR and web vitals.',
-    explanation: {
-      matchScore: 88,
-      chainOfThought: 'Demonstrates SSR ownership and accessibility improvements that map to roadmap.',
-      greenFlags: ['Owns performance budgets', 'Mentors designers on a11y'],
-      redFlags: ['Needs support on cloud automation'],
+    body: JSON.stringify(payload),
+  });
+};
+
+const searchMatches = async (jobDescription: string): Promise<SearchResult[]> => {
+  const payload = { job_description: jobDescription };
+  const data = await fetchJson(`${API_BASE_URL}/search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
     },
-    skills: candidates[1].skills,
-  },
-  '3': {
-    jobDescription: 'Full-stack engineer to steward partner APIs and build a cohesive UI kit.',
-    resumeText: '5 years experience across platform teams building SDKs and contract-tested services.',
-    explanation: {
-      matchScore: 86,
-      chainOfThought: 'Brings API ownership and reliable delivery; aligns with partner integrations.',
-      greenFlags: ['Built typed SDK', 'Introduced contract testing discipline'],
-      redFlags: ['Has limited people leadership exposure'],
-    },
-    skills: candidates[2].skills,
-  },
-  '4': {
-    jobDescription: 'Engineer to modernize a React/Node stack and tighten release quality.',
-    resumeText: '8 years modernizing UIs, migrating legacy modules, and hardening CI/CD pipelines.',
-    explanation: {
-      matchScore: 83,
-      chainOfThought: 'Systems mindset fits modernization goals; breadth across FE/BE pipelines.',
-      greenFlags: ['CI/CD specialist', 'UI modernization experience'],
-      redFlags: ['GraphQL practice is still developing'],
-    },
-    skills: candidates[3].skills,
-  },
-  '5': {
-    jobDescription: 'Engineer to own billing flows while building reliable, typed React features.',
-    resumeText: '6 years delivering billing, monitoring, and full-stack features with product partners.',
-    explanation: {
-      matchScore: 80,
-      chainOfThought: 'Steady delivery across billing and monitoring with collaborative habits.',
-      greenFlags: ['Improved billing reliability', 'Communicates incidents clearly'],
-      redFlags: ['Needs guidance on complex frontend architecture'],
-    },
-    skills: candidates[4].skills,
-  },
+    body: JSON.stringify(payload),
+  });
+  return Array.isArray(data.results) ? data.results : [];
 };
 
 function App() {
-  const [activeCandidateId, setActiveCandidateId] = React.useState<string>(candidates[0].id);
-  const activeCandidate = candidates.find((c) => c.id === activeCandidateId) ?? candidates[0];
-  const activeDetail = candidateDetails[activeCandidate.id];
+  const [jobDescription, setJobDescription] = React.useState('');
+  const [jobFileName, setJobFileName] = React.useState('');
+  const [resumeFiles, setResumeFiles] = React.useState<File[]>([]);
+  const [candidates, setCandidates] = React.useState<CandidateProfile[]>([]);
+  const [candidateDetails, setCandidateDetails] = React.useState<Record<string, MatchDetail>>({});
+  const [activeCandidateId, setActiveCandidateId] = React.useState<string | null>(null);
+  const [searchResults, setSearchResults] = React.useState<SearchResult[]>([]);
+  const [chunkCount, setChunkCount] = React.useState(0);
+  const [isRunning, setIsRunning] = React.useState(false);
+  const [statusMessage, setStatusMessage] = React.useState('');
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const [lastRunAt, setLastRunAt] = React.useState('');
+
+  const activeCandidate = candidates.find((candidate) => candidate.id === activeCandidateId) ?? null;
+  const activeDetail = activeCandidate ? candidateDetails[activeCandidate.id] : null;
+  const topScore = candidates.length > 0 ? Math.max(...candidates.map((candidate) => candidate.matchScore)) : 0;
+
+  const handleJobFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setErrorMessage('');
+    setStatusMessage(`Extracting job description from ${file.name}...`);
+    setJobFileName(file.name);
+
+    try {
+      const text = await extractText(file);
+      setJobDescription(cleanWhitespace(text));
+      setStatusMessage(`Loaded job description from ${file.name}.`);
+    } catch (error) {
+      setErrorMessage('Could not extract text from the job description PDF.');
+      setStatusMessage('');
+    }
+  };
+
+  const handleResumeFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files ? Array.from(event.target.files) : [];
+    setResumeFiles(files);
+  };
+
+  const runAnalysis = async () => {
+    setErrorMessage('');
+
+    if (!jobDescription.trim()) {
+      setErrorMessage('Add a job description or load the PDF first.');
+      return;
+    }
+
+    if (resumeFiles.length === 0) {
+      setErrorMessage('Select at least one resume PDF.');
+      return;
+    }
+
+    setIsRunning(true);
+    setStatusMessage('Preparing analysis...');
+    setSearchResults([]);
+    setChunkCount(0);
+
+    const normalizedJob = cleanWhitespace(jobDescription);
+    const trimmedJob = truncateText(normalizedJob, MAX_MATCH_TEXT);
+
+    const newCandidates: CandidateProfile[] = [];
+    const newDetails: Record<string, MatchDetail> = {};
+    let totalChunks = 0;
+
+    try {
+      for (const [index, file] of resumeFiles.entries()) {
+        setStatusMessage(`Processing ${file.name} (${index + 1}/${resumeFiles.length})...`);
+
+        const [resumeText, chunks] = await Promise.all([
+          extractText(file),
+          ingestResume(file),
+        ]);
+        totalChunks += chunks;
+
+        const normalizedResume = cleanWhitespace(resumeText);
+        const matchPayload = truncateText(normalizedResume, MAX_MATCH_TEXT);
+        const matchData = await runMatch(trimmedJob, matchPayload);
+        const match = parseMatchResponse(matchData as Record<string, unknown>);
+
+        const candidateName = candidateNameFromFile(file.name) || `Candidate ${index + 1}`;
+        const candidateId = `${candidateName}-${index}-${Date.now()}`;
+        const summary = truncateText(normalizedResume, 180);
+        const highlights = match.greenFlags.slice(0, 2);
+        const skills = buildSkillSignals(match.greenFlags, match.redFlags);
+        const explanationText = match.chainOfThought || 'No explanation returned.';
+
+        newCandidates.push({
+          id: candidateId,
+          name: candidateName,
+          role: 'Candidate',
+          matchScore: match.matchScore,
+          skills,
+          summary: summary || 'Resume parsed successfully.',
+          highlights,
+          explanation: {
+            chainOfThought: explanationText,
+            greenFlags: match.greenFlags,
+            redFlags: match.redFlags,
+          },
+        });
+
+        newDetails[candidateId] = {
+          jobDescription: trimmedJob,
+          resumeText: truncateText(normalizedResume, MAX_DISPLAY_TEXT),
+          explanation: {
+            matchScore: match.matchScore,
+            chainOfThought: explanationText,
+            greenFlags: match.greenFlags,
+            redFlags: match.redFlags,
+          },
+          skills,
+        };
+      }
+
+      const sortedCandidates = [...newCandidates].sort((a, b) => b.matchScore - a.matchScore);
+      setCandidates(sortedCandidates);
+      setCandidateDetails(newDetails);
+      setActiveCandidateId(sortedCandidates[0]?.id ?? null);
+
+      const results = await searchMatches(trimmedJob);
+      setSearchResults(results.slice(0, 5));
+      setChunkCount(totalChunks);
+
+      setStatusMessage(`Done. ${sortedCandidates.length} resumes analyzed, ${totalChunks} chunks ingested.`);
+      setLastRunAt(new Date().toLocaleTimeString());
+    } catch (error) {
+      setErrorMessage('Analysis failed. Check the backend server and try again.');
+      setStatusMessage('');
+    } finally {
+      setIsRunning(false);
+    }
+  };
 
   return (
     <main className="app-shell">
       <header className="hero">
         <div>
           <div className="eyebrow">Recruitment Assistant</div>
-          <h1>Quality matches without losing transparency</h1>
+          <h1>Run real resume matches in minutes</h1>
           <p>
-            A modern recruiter cockpit combining AI scoring, transparent reasoning, and bias-aware insights.
+            Upload a job description and resume PDFs to score candidates with transparent AI reasoning.
           </p>
           <div className="pill-row">
-            <span className="pill">Real-time match scoring</span>
-            <span className="pill">Glass-box explanations</span>
-            <span className="pill">Bias guardrails</span>
+            <span className="pill">Milvus-powered search</span>
+            <span className="pill">LLM match scoring</span>
+            <span className="pill">Explainable output</span>
           </div>
         </div>
         <div className="hero-panel">
           <div className="hero-metric">
             <small>Top candidate score</small>
-            <strong>{Math.max(...candidates.map((c) => c.matchScore))}</strong>
-            <span>High alignment with full-stack requisition</span>
+            <strong>{candidates.length > 0 ? Math.round(topScore) : '--'}</strong>
+            <span>{candidates.length > 0 ? 'Best match from current run' : 'Awaiting analysis'}</span>
           </div>
           <div className="hero-card">
-            <small>Time saved this week</small>
-            <strong style={{ fontSize: '22px', color: '#0f172a' }}>7.5 hrs</strong>
-            <span className="secondary-text">Automated screening + structured summaries</span>
+            <small>Resumes analyzed</small>
+            <strong style={{ fontSize: '22px', color: '#0f172a' }}>{candidates.length}</strong>
+            <span className="secondary-text">Upload new files to refresh</span>
           </div>
           <div className="hero-card">
-            <small>Signals tracked</small>
-            <strong style={{ fontSize: '22px', color: '#0f172a' }}>18</strong>
-            <span className="secondary-text">Skills, tenure, ownership, leadership</span>
+            <small>Milvus chunks</small>
+            <strong style={{ fontSize: '22px', color: '#0f172a' }}>{chunkCount}</strong>
+            <span className="secondary-text">Total chunks ingested</span>
           </div>
           <div className="hero-card">
-            <small>Bias alerts</small>
-            <strong style={{ fontSize: '22px', color: '#0f172a' }}>0</strong>
-            <span className="secondary-text">Guardrails are active</span>
+            <small>Last run</small>
+            <strong style={{ fontSize: '22px', color: '#0f172a' }}>{lastRunAt || '--'}</strong>
+            <span className="secondary-text">Local backend at {API_BASE_URL}</span>
           </div>
         </div>
       </header>
 
       <div className="section-shell">
+        <section className="card">
+          <div className="card-header">
+            <div>
+              <p className="eyebrow" style={{ color: '#0ea5e9' }}>
+                Inputs
+              </p>
+              <h2 className="card-title">Upload job description and resumes</h2>
+              <p className="secondary-text">Use files from `sample_jd` and `sample_resumes` to test.</p>
+            </div>
+          </div>
+
+          <div className="form-grid">
+            <div className="form-field">
+              <label htmlFor="job-pdf">Job description PDF</label>
+              <input
+                id="job-pdf"
+                type="file"
+                accept="application/pdf"
+                onChange={handleJobFileChange}
+                className="input"
+              />
+              {jobFileName && <span className="secondary-text">Loaded: {jobFileName}</span>}
+              <label htmlFor="job-text">Job description text</label>
+              <textarea
+                id="job-text"
+                value={jobDescription}
+                onChange={(event) => setJobDescription(event.target.value)}
+                placeholder="Paste a job description or load the PDF above."
+                className="textarea"
+                rows={6}
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="resume-pdf">Resume PDFs</label>
+              <input
+                id="resume-pdf"
+                type="file"
+                accept="application/pdf"
+                multiple
+                onChange={handleResumeFileChange}
+                className="input"
+              />
+              {resumeFiles.length > 0 ? (
+                <ul className="upload-list">
+                  {resumeFiles.map((file) => (
+                    <li key={file.name}>{file.name}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span className="secondary-text">No resumes selected yet.</span>
+              )}
+            </div>
+          </div>
+
+          <div className="action-row">
+            <button className="button primary" onClick={runAnalysis} disabled={isRunning}>
+              {isRunning ? 'Running analysis...' : 'Run analysis'}
+            </button>
+            {statusMessage && <div className="status-banner">{statusMessage}</div>}
+            {errorMessage && <div className="status-banner error">{errorMessage}</div>}
+          </div>
+        </section>
+
         <div className="page-grid">
           <section className="card">
             <div className="card-header">
@@ -233,21 +395,32 @@ function App() {
                   Shortlist
                 </p>
                 <h2 className="card-title">Best next conversations</h2>
-                <p className="secondary-text">Curated matches scored against the active requisition.</p>
-              </div>
-              <div className="warning-banner" style={{ visibility: 'hidden' }}>
-                <span>⚠</span>Safety layer
+                <p className="secondary-text">Ranked by match score for the active requisition.</p>
               </div>
             </div>
             <div className="candidate-list">
-              {candidates.map((candidate) => (
-                <CandidateCard key={candidate.id} candidate={candidate} onSelect={setActiveCandidateId} />
-              ))}
+              {candidates.length > 0 ? (
+                candidates.map((candidate) => (
+                  <CandidateCard
+                    key={candidate.id}
+                    candidate={candidate}
+                    onSelect={(selected) => setActiveCandidateId(selected.id)}
+                  />
+                ))
+              ) : (
+                <div className="empty-state">
+                  Upload a job description and resume PDFs, then run analysis to see matches.
+                </div>
+              )}
             </div>
           </section>
 
           <section className="card detail-shell">
-            <MatchDetailView candidate={activeCandidate} detail={activeDetail} />
+            {activeCandidate && activeDetail ? (
+              <MatchDetailView candidate={activeCandidate} detail={activeDetail} />
+            ) : (
+              <div className="empty-state">Select a candidate to view match details.</div>
+            )}
           </section>
         </div>
 
@@ -255,17 +428,40 @@ function App() {
           <div className="card-header">
             <div>
               <p className="eyebrow" style={{ color: '#0ea5e9' }}>
-                Safety Layer
+                Milvus Search
               </p>
-              <h2 className="card-title">Bias & diversity funnel</h2>
-              <p className="secondary-text">Track demographic drop-off across the pipeline.</p>
-            </div>
-            <div className="warning-banner">
-              <span>⚡</span> Potential disparate impact surfaced
+              <h2 className="card-title">Semantic retrieval results</h2>
+              <p className="secondary-text">Top chunks matched against the job description.</p>
             </div>
           </div>
-          <DiversitySankey candidates={candidates.slice(0, 4)} />
+          {searchResults.length > 0 ? (
+            <div className="search-results">
+              {searchResults.map((result, index) => (
+                <div key={`${result.score}-${index}`} className="search-card">
+                  <div className="search-score">Score: {result.score.toFixed(3)}</div>
+                  <p className="secondary-text">{result.text}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">Run analysis to see semantic search results.</div>
+          )}
         </section>
+
+        {candidates.length > 0 && (
+          <section className="card">
+            <div className="card-header">
+              <div>
+                <p className="eyebrow" style={{ color: '#0ea5e9' }}>
+                  Safety Layer
+                </p>
+                <h2 className="card-title">Bias & diversity funnel</h2>
+                <p className="secondary-text">Synthetic demographics for demo visualization only.</p>
+              </div>
+            </div>
+            <DiversitySankey candidates={candidates.slice(0, 6)} />
+          </section>
+        )}
       </div>
     </main>
   );
